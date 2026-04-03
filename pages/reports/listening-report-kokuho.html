@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Social Listening Report — Kokuho</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0b0f13;
+  --slide-bg: #0f1419;
+  --card: #161d26;
+  --card-alt: #1c2530;
+  --accent: #5fb8d9;
+  --warm: #f4a261;
+  --green: #2ec4b6;
+  --red: #e76f51;
+  --pink: #f78da7;
+  --purple: #a78bfa;
+  --text: #e4e9ef;
+  --muted: #7a8da0;
+  --dim: #4a5a6a;
+  --border: #1e2a38;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  background: var(--bg);
+  font-family: 'Poppins', sans-serif;
+  color: var(--text);
+  -webkit-font-smoothing: antialiased;
+  display: flex; flex-direction: column; align-items: center;
+  gap: 20px; padding: 20px 0;
+}
+
+.slide {
+  width: 1280px; height: 720px;
+  background: var(--slide-bg);
+  border-radius: 12px; border: 1px solid var(--border);
+  position: relative; overflow: hidden; flex-shrink: 0;
+  display: flex; flex-direction: column; padding: 56px 64px;
+}
+.slide::before {
+  content:'';
+  position:absolute;
+  inset:0;
+  background:
+    linear-gradient(180deg, rgba(11,15,19,0.72) 0%, rgba(11,15,19,0.62) 100%),
+    url('assets/imgs/background.png') center/cover no-repeat;
+  opacity: 0.34;
+  pointer-events: none;
+}
+.slide > * { position: relative; z-index: 1; }
+.slide-number { position: absolute; bottom: 20px; right: 32px; font-size: 11px; color: var(--dim); }
+.slide-brand { position: absolute; bottom: 20px; left: 32px; display: flex; align-items: center; height: 12px; }
+.slide-brand img { display: block; height: 12px; width: auto; opacity: 0.42; }
+
+/* COVER */
+.slide.cover {
+  background: linear-gradient(155deg, #0a0e13 0%, #0f1922 40%, #152a3a 100%);
+  justify-content: center;
+}
+.slide.cover::before {
+  content:'';
+  position:absolute;
+  inset:0;
+  background:
+    radial-gradient(circle at 88% 24%, rgba(95,184,217,0.15) 0%, transparent 20%),
+    radial-gradient(circle at 12% 82%, rgba(244,162,97,0.08) 0%, transparent 18%),
+    linear-gradient(155deg, rgba(10,14,19,0.82) 0%, rgba(15,25,34,0.74) 40%, rgba(21,42,58,0.68) 100%),
+    url('assets/imgs/background.png') center/cover no-repeat;
+  opacity: 0.95;
+}
+ .slide.cover::after {
+  content:'';position:absolute;bottom:-120px;left:-120px;width:500px;height:500px;
+  background:radial-gradient(circle,rgba(244,162,97,0.05) 0%,transparent 70%);border-radius:50%;
+}
+.cover-label { font-size: 12px; font-weight: 600; letter-spacing: 4px; text-transform: uppercase; color: var(--purple); margin-bottom: 32px; }
+.cover h1 { font-size: 58px; line-height: 1.08; font-weight: 700; max-width: 750px; }
+.cover h1 em { font-style: italic; color: var(--warm); font-weight: 400; }
+.cover-meta { display: flex; gap: 40px; margin-top: 44px; }
+.cover-meta-item { border-left: 2px solid var(--purple); padding-left: 14px; }
+.cover-meta-item .lbl { font-size: 10px; text-transform: uppercase; letter-spacing: 2px; color: var(--muted); margin-bottom: 2px; }
+.cover-meta-item .val { font-size: 16px; font-weight: 600; }
+
+/* DIVIDER */
+.slide.divider { justify-content: center; background: linear-gradient(180deg, var(--slide-bg) 0%, var(--card) 100%); }
+.slide.divider::before { opacity: 0.42; }
+.divider .sec-num { font-size: 12px; color: var(--purple); letter-spacing: 3px; margin-bottom: 14px; }
+.divider h2 { font-size: 48px; line-height: 1.1; font-weight: 600; max-width: 650px; }
+.divider h2 em { font-style: italic; color: var(--warm); font-weight: 400; }
+
+/* TYPE */
+h3 { font-size: 24px; font-weight: 600; margin-bottom: 16px; }
+.subtitle { font-size: 13px; color: var(--muted); line-height: 1.6; max-width: 600px; margin-bottom: 18px; }
+.highlight { background: linear-gradient(135deg, var(--warm), #e88d4f); color: var(--bg); padding: 1px 8px; font-weight: 600; }
+
+/* METRIC CARDS */
+.m-row { display: grid; gap: 14px; margin-bottom: 18px; }
+.m-row-4 { grid-template-columns: repeat(4, 1fr); }
+.m-row-3 { grid-template-columns: repeat(3, 1fr); }
+.m-row-2 { grid-template-columns: repeat(2, 1fr); }
+.m-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 20px; }
+.m-card .lbl { font-size: 10px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--muted); margin-bottom: 6px; }
+.m-card .val { font-size: 28px; font-weight: 700; }
+.m-card .sub { font-size: 11px; color: var(--muted); margin-top: 3px; }
+
+/* TABLES */
+.p-table { width: 100%; border-collapse: collapse; }
+.p-table th { text-align: left; padding: 9px 12px; font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); background: var(--card); border-bottom: 2px solid var(--border); }
+.p-table td { padding: 10px 12px; border-bottom: 1px solid rgba(30,42,56,0.35); font-size: 13px; }
+.brand-name { font-weight: 600; }
+.badge { display: inline-flex; align-items: center; gap: 3px; padding: 3px 8px; border-radius: 6px; font-size: 12px; font-weight: 600; }
+.b-green { background: rgba(46,196,182,0.12); color: var(--green); }
+.b-red { background: rgba(231,111,81,0.12); color: var(--red); }
+.b-yellow { background: rgba(244,162,97,0.12); color: var(--warm); }
+.b-purple { background: rgba(167,139,250,0.12); color: var(--purple); }
+
+/* INSIGHT */
+.insight { border-left: 3px solid var(--warm); padding: 14px 18px; background: rgba(244,162,97,0.04); border-radius: 0 10px 10px 0; font-size: 13px; line-height: 1.65; }
+.insight strong { color: var(--warm); }
+
+/* CHARTS */
+.chart-wrap { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 22px; display: flex; flex-direction: column; overflow: hidden; min-width: 0; min-height: 0; }
+.chart-wrap h4 { font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--muted); margin-bottom: 14px; }
+.chart-area { position: relative; flex: 1; min-width: 0; min-height: 0; }
+.chart-wrap canvas { width: 100% !important; height: 100% !important; display: block; }
+
+.sentiment-slide-content { display:grid; grid-template-rows:minmax(0,1fr) auto; gap:12px; flex:1; min-height:0; }
+.sentiment-layout { display:grid; grid-template-columns:0.44fr 0.56fr; gap:20px; min-height:0; align-items:start; overflow:hidden; }
+.sentiment-panel { display:flex; flex-direction:column; min-width:0; min-height:0; gap:12px; }
+.sentiment-metrics { display:grid; grid-template-columns:repeat(3, 1fr); gap:12px; }
+.sentiment-metrics .m-card { min-width:0; }
+.sentiment-chart-card { flex:0 0 auto; height: 390px; }
+.sentiment-chart-card .chart-area { min-height: 0; }
+.sentiment-themes { display:flex; flex-direction:column; min-width:0; min-height:0; overflow:hidden; }
+.sentiment-themes .subtitle { margin-bottom:12px; }
+.sentiment-themes .theme-cluster { margin-bottom: 10px; }
+.sentiment-reading { margin-top:0; }
+
+.audience-layout { display:grid; grid-template-rows:minmax(0,1fr) auto; gap:18px; flex:1; min-height:0; }
+.audience-main-grid { display:grid; grid-template-columns:0.55fr 0.45fr; gap:20px; min-height:0; align-items:start; }
+.audience-panel-left,
+.audience-panel-right { display:flex; flex-direction:column; min-height:0; }
+.audience-top-grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:8px; }
+.audience-top-grid .chart-wrap { height: 338px; }
+.audience-bottom-grid { display:grid; grid-template-columns:0.55fr 0.45fr; gap:20px; align-items:start; }
+.audience-reading { margin-top:0; }
+.detractors-block { margin-top:0; }
+.detractors-card { margin-top:0; min-height: 100px; display:flex; align-items:center; }
+
+/* FRAMEWORK */
+.fw-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 18px; flex: 1; }
+.fw-card { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 26px; position: relative; overflow: hidden; display: flex; flex-direction: column; }
+.fw-card::before { content:''; position: absolute; top:0;left:0;right:0; height:3px; }
+.fw-card:nth-child(1)::before { background: var(--purple); }
+.fw-card:nth-child(2)::before { background: var(--warm); }
+.fw-card:nth-child(3)::before { background: var(--green); }
+.fw-card .q { font-size: 17px; font-weight: 500; margin-bottom: 16px; line-height: 1.35; flex:1; }
+.tag { display: inline-block; padding: 3px 10px; border-radius: 100px; font-size: 11px; font-weight: 600; margin: 2px; }
+.tag-p { background: rgba(167,139,250,0.14); color: var(--purple); }
+.tag-w { background: rgba(244,162,97,0.14); color: var(--warm); }
+.tag-g { background: rgba(46,196,182,0.14); color: var(--green); }
+
+/* METHOD */
+.method-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 18px; margin-top: 20px; }
+.method-item h4 { font-size: 12px; font-weight: 600; color: var(--purple); margin-bottom: 6px; letter-spacing: 1px; text-transform: uppercase; }
+.method-item p { font-size: 13px; color: var(--muted); line-height: 1.5; }
+
+/* VERBATIM */
+.verb-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.verb-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 18px; }
+.verb-card.pos { border-left: 3px solid var(--green); }
+.verb-card.neu { border-left: 3px solid var(--muted); }
+.verb-card.neg { border-left: 3px solid var(--red); }
+.verb-card .clbl { font-size: 10px; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 6px; }
+.verb-card.pos .clbl { color: var(--green); }
+.verb-card.neu .clbl { color: var(--muted); }
+.verb-card.neg .clbl { color: var(--red); }
+.verb-card p { font-size: 12.5px; color: var(--muted); line-height: 1.55; font-style: italic; }
+.verb-card .meta { font-size: 10px; color: var(--dim); margin-top: 6px; font-style: normal; }
+
+/* THEME PILLS */
+.theme-cluster { margin-bottom: 14px; }
+.theme-label { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 6px; }
+.theme-pills { display: flex; flex-wrap: wrap; gap: 4px; }
+.theme-pill { padding: 3px 10px; border-radius: 100px; font-size: 11px; background: var(--card-alt); color: var(--muted); border: 1px solid var(--border); }
+.theme-pill.hot { background: rgba(167,139,250,0.12); color: var(--purple); border-color: rgba(167,139,250,0.25); }
+
+/* ADVOCATE TABLE */
+.adv-table { width: 100%; border-collapse: collapse; }
+.adv-table th { text-align: left; padding: 8px 10px; font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); border-bottom: 1px solid var(--border); }
+.adv-table td { padding: 8px 10px; border-bottom: 1px solid rgba(30,42,56,0.3); font-size: 12px; }
+
+/* KCS */
+.kcs-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; flex: 1; }
+.kcs-card { border-radius: 14px; padding: 22px; display: flex; flex-direction: column; }
+.kcs-card h4 { font-size: 20px; font-weight: 700; margin-bottom: 12px; }
+.kcs-card ul { list-style: none; padding: 0; }
+.kcs-card li { padding: 5px 0; font-size: 12.5px; line-height: 1.5; border-bottom: 1px solid rgba(255,255,255,0.03); }
+.kcs-card li:last-child { border: none; }
+.kcs-card.keep { background: rgba(46,196,182,0.06); border: 1px solid rgba(46,196,182,0.18); }
+.kcs-card.keep h4 { color: var(--green); }
+.kcs-card.change { background: rgba(167,139,250,0.06); border: 1px solid rgba(167,139,250,0.18); }
+.kcs-card.change h4 { color: var(--purple); }
+.kcs-card.start { background: rgba(244,162,97,0.06); border: 1px solid rgba(244,162,97,0.18); }
+.kcs-card.start h4 { color: var(--warm); }
+
+/* CONCLUSION CARDS */
+.conc-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.conc-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 20px; display: flex; flex-direction: column; justify-content: center; }
+.conc-card p { font-size: 13px; line-height: 1.6; }
+
+@media print {
+  html, body { width: 13.333in; margin: 0; padding: 0; background: #000; }
+  body { gap: 0; }
+  .slide { width: 13.333in; height: 7.5in; margin: 0; border: none; border-radius: 0; page-break-after: always; break-after: page; }
+  .slide:last-of-type { page-break-after: auto; break-after: auto; }
+}
+</style>
+</head>
+<body>
+
+<!-- ========== SLIDE 1: COVER ========== -->
+<div class="slide cover">
+  <div class="cover-label">mescalina ® — social listening report</div>
+  <h1>Kokuho<br><em>El Alma del Kabuki</em></h1>
+  <div class="cover-meta">
+    <div class="cover-meta-item"><div class="lbl">Periodo</div><div class="val">26 — 31 Marzo 2026</div></div>
+    <div class="cover-meta-item"><div class="lbl">Menciones</div><div class="val">101</div></div>
+    <div class="cover-meta-item"><div class="lbl">Alcance</div><div class="val">1.86M</div></div>
+    <div class="cover-meta-item"><div class="lbl">Sentimiento neto</div><div class="val" style="color:var(--green)">+46</div></div>
+  </div>
+  <div class="slide-brand"><img src="/assets/imgs/Logo_Mescalina_White.png" alt="mescalina"></div><div class="slide-number">01 / 12</div>
+</div>
+
+<!-- ========== SLIDE 2: FRAMEWORK ========== -->
+<div class="slide">
+  <h3>¿Qué queremos saber?</h3>
+  <p class="subtitle">El listening responde tres preguntas sobre la conversación digital alrededor de un tópico.</p>
+  <div class="fw-grid">
+    <div class="fw-card">
+      <div class="q">¿Qué se dice y cuánto se habla?</div>
+      <div><span class="tag tag-p">Volumen</span><span class="tag tag-p">Alcance</span><span class="tag tag-p">Tendencia</span><span class="tag tag-p">Canales</span></div>
+    </div>
+    <div class="fw-card">
+      <div class="q">¿Cómo se siente la gente al respecto?</div>
+      <div><span class="tag tag-w">Sentimiento</span><span class="tag tag-w">Temas</span><span class="tag tag-w">Términos clave</span><span class="tag tag-w">Hashtags</span></div>
+    </div>
+    <div class="fw-card">
+      <div class="q">¿Quién está hablando y desde dónde?</div>
+      <div><span class="tag tag-g">Advocates</span><span class="tag tag-g">Detractors</span><span class="tag tag-g">Demografía</span><span class="tag tag-g">Geografía</span></div>
+    </div>
+  </div>
+  <div class="method-row">
+    <div class="method-item"><h4>Periodo</h4><p>26 — 31 de Marzo 2026 (semana de estreno)</p></div>
+    <div class="method-item"><h4>Fuentes monitoreadas</h4><p>X (Twitter), Instagram, Bluesky, News, Blogs, Podcasts</p></div>
+    <div class="method-item"><h4>Herramienta</h4><p>Sprinklr — Quick Search. Query: "Kokuho" OR "kokuho" OR "#kokuho"</p></div>
+  </div>
+  <div class="slide-brand"><img src="./assets/imgs/Logo_Mescalina_White.png" alt="mescalina"></div><div class="slide-number">02 / 12</div>
+</div>
+
+<!-- ========== SLIDE 3: DIVIDER ========== -->
+<div class="slide divider">
+  <div class="sec-num">01 — PANORAMA GENERAL</div>
+  <h2>¿Cuánto se habla<br>y <em>dónde</em>?</h2>
+  <div class="slide-brand"><img src="./assets/imgs/Logo_Mescalina_White.png" alt="mescalina"></div><div class="slide-number">03 / 12</div>
+</div>
+
+<!-- ========== SLIDE 4: OVERVIEW METRICS + VOLUME ========== -->
+<div class="slide" style="padding:44px 56px;">
+  <h3>Resumen de conversación</h3>
+  <div class="m-row m-row-4">
+    <div class="m-card"><div class="lbl">Menciones</div><div class="val" style="color:var(--purple)">101</div><div class="sub">En 6 días de monitoreo</div></div>
+    <div class="m-card"><div class="lbl">Alcance potencial</div><div class="val" style="color:var(--accent)">1.86M</div><div class="sub">Personas expuestas</div></div>
+    <div class="m-card"><div class="lbl">Sentimiento neto</div><div class="val" style="color:var(--green)">+46</div><div class="sub">52 positivas — 6 negativas</div></div>
+    <div class="m-card"><div class="lbl">Canal dominante</div><div class="val" style="color:var(--text)">X</div><div class="sub">51.5% de las menciones</div></div>
+  </div>
+  <div style="display:grid;grid-template-columns:1.4fr 0.6fr;gap:16px;flex:1;">
+    <div class="chart-wrap"><h4>Volumen diario de menciones</h4><div class="chart-area"><canvas id="c1"></canvas></div></div>
+    <div class="chart-wrap"><h4>Distribución por canal</h4><div class="chart-area"><canvas id="c2"></canvas></div></div>
+  </div>
+  <div class="slide-brand"><img src="./assets/imgs/Logo_Mescalina_White.png" alt="mescalina"></div><div class="slide-number">04 / 12</div>
+</div>
+
+<!-- ========== SLIDE 5: DIVIDER SENTIMIENTO ========== -->
+<div class="slide divider">
+  <div class="sec-num">02 — ANÁLISIS DE CONVERSACIÓN</div>
+  <h2>¿Cómo se siente<br>la <em>audiencia</em>?</h2>
+  <div class="slide-brand"><img src="./assets/imgs/Logo_Mescalina_White.png" alt="mescalina"></div><div class="slide-number">05 / 12</div>
+</div>
+
+<!-- ========== SLIDE 6: SENTIMENT + THEMES ========== -->
+<div class="slide" style="padding:44px 56px;">
+  <div class="sentiment-slide-content">
+    <div class="sentiment-layout">
+      <!-- LEFT: Sentiment -->
+      <div class="sentiment-panel">
+        <h3 style="font-size:20px;">Sentimiento</h3>
+        <div class="sentiment-metrics">
+          <div class="m-card" style="border-left:3px solid var(--green);padding:14px 18px;"><div class="lbl">Positivo</div><div class="val" style="color:var(--green);font-size:32px;">51.5%</div><div class="sub">52 menciones</div></div>
+          <div class="m-card" style="border-left:3px solid var(--muted);padding:14px 18px;"><div class="lbl">Neutro</div><div class="val" style="color:var(--muted);font-size:32px;">42.6%</div><div class="sub">43 menciones</div></div>
+          <div class="m-card" style="border-left:3px solid var(--red);padding:14px 18px;"><div class="lbl">Negativo</div><div class="val" style="color:var(--red);font-size:32px;">5.9%</div><div class="sub">6 menciones</div></div>
+        </div>
+        <div class="chart-wrap sentiment-chart-card"><h4>Sentimiento general</h4><div class="chart-area"><canvas id="c3"></canvas></div></div>
+      </div>
+      <!-- RIGHT: Themes -->
+      <div class="sentiment-themes">
+        <h3 style="font-size:20px;">Temas principales de conversación</h3>
+        <p class="subtitle" style="margin-bottom:14px;">Clusters temáticos extraídos automáticamente de las menciones.</p>
+        <div class="theme-cluster">
+          <div class="theme-label">🎭 Teatro Kabuki <span class="badge b-purple" style="font-size:10px;">Peso: 100</span></div>
+          <div class="theme-pills">
+            <span class="theme-pill hot">Ryo Yoshizawa</span><span class="theme-pill hot">Hijo de un Yakuza</span><span class="theme-pill">Papeles femeninos</span><span class="theme-pill">Tradición</span><span class="theme-pill">Arte</span><span class="theme-pill">Estreno en Cinépolis</span>
+          </div>
+        </div>
+        <div class="theme-cluster">
+          <div class="theme-label">🏆 Nominada al Óscar <span class="badge b-purple" style="font-size:10px;">Peso: 85</span></div>
+          <div class="theme-pills">
+            <span class="theme-pill hot">Mejor Maquillaje y Peinado</span><span class="theme-pill">Emoción y Espectáculo</span><span class="theme-pill">Adquiere tus boletos</span>
+          </div>
+        </div>
+        <div class="theme-cluster">
+          <div class="theme-label">🎬 Cine japonés <span class="badge b-purple" style="font-size:10px;">Peso: 95</span></div>
+          <div class="theme-pills">
+            <span class="theme-pill hot">Gran película</span><span class="theme-pill">Premios</span><span class="theme-pill">3 horas</span><span class="theme-pill">Ken Watanabe</span>
+          </div>
+        </div>
+        <div class="theme-cluster">
+          <div class="theme-label">❤️ Amistad y Redención <span class="badge b-purple" style="font-size:10px;">Peso: 82</span></div>
+          <div class="theme-pills">
+            <span class="theme-pill">Tradición y Sacrificio</span><span class="theme-pill">Maestro del Kabuki</span><span class="theme-pill">Escenario</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="insight sentiment-reading">
+      <strong>Lectura:</strong> La conversación gira en torno al <strong>valor artístico y cultural</strong>, no al entretenimiento masivo. La nominación al Óscar funciona como gancho de credibilidad. La historia de redención personal conecta emocionalmente.
+    </div>
+  </div>
+  <div class="slide-brand"><img src="./assets/imgs/Logo_Mescalina_White.png" alt="mescalina"></div><div class="slide-number">06 / 12</div>
+</div>
+
+<!-- ========== SLIDE 7: TERMS + HASHTAGS ========== -->
+<div class="slide" style="padding:44px 56px;">
+  <h3>Términos clave y Hashtags</h3>
+  <p class="subtitle">Palabras más frecuentes en las menciones del periodo y hashtags con mayor presencia.</p>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;flex:1;">
+    <div class="chart-wrap"><h4>Top 12 términos de conversación</h4><div class="chart-area"><canvas id="c4"></canvas></div></div>
+    <div class="chart-wrap"><h4>Hashtags más utilizados</h4><div class="chart-area"><canvas id="c5"></canvas></div></div>
+  </div>
+  <div class="insight" style="margin-top:14px;">
+    <strong>Lectura:</strong> "kabuki", "alma", "arte" y "teatro" dominan — la conversación es <strong>culturalmente sofisticada</strong>. Términos como "oscar", "nominada" y "visual" refuerzan la percepción de calidad. "yakuza" aparece como gancho narrativo (la historia del protagonista). El hashtag dominante es <strong>#kokuho</strong> con presencia abrumadora (46 de 101 menciones).
+  </div>
+  <div class="slide-brand"><img src="./assets/imgs/Logo_Mescalina_White.png" alt="mescalina"></div><div class="slide-number">07 / 12</div>
+</div>
+
+<!-- ========== SLIDE 8: DIVIDER AUDIENCIA ========== -->
+<div class="slide divider">
+  <div class="sec-num">03 — AUDIENCIA & VOCES</div>
+  <h2>¿Quién está<br><em>hablando</em>?</h2>
+  <div class="slide-brand"><img src="./assets/imgs/Logo_Mescalina_White.png" alt="mescalina"></div><div class="slide-number">08 / 12</div>
+</div>
+
+<!-- ========== SLIDE 9: AUDIENCE + ADVOCATES ========== -->
+<div class="slide" style="padding:44px 56px;">
+  <div class="audience-layout">
+    <div class="audience-main-grid">
+      <div class="audience-panel-left">
+        <h3 style="font-size:20px;">Perfil de la audiencia</h3>
+        <div class="audience-top-grid">
+          <div class="chart-wrap" style="padding:16px;"><h4>Geografía</h4><div class="chart-area"><canvas id="c6"></canvas></div></div>
+          <div class="chart-wrap" style="padding:16px;"><h4>Tipo de contenido</h4><div class="chart-area"><canvas id="c7"></canvas></div></div>
+        </div>
+      </div>
+      <div class="audience-panel-right">
+        <h3 style="font-size:20px;">Top Advocates</h3>
+        <p class="subtitle" style="margin-bottom:10px;">Voces que generaron menciones positivas con mayor alcance.</p>
+        <table class="adv-table">
+          <thead><tr><th>Cuenta</th><th>Red</th><th>Seguidores</th><th>Menciones</th></tr></thead>
+          <tbody>
+            <tr><td><span class="brand-name">@laestatuilla</span></td><td>X</td><td>7,731</td><td>2</td></tr>
+            <tr><td><span class="brand-name">@GrungeHamster81</span></td><td>X</td><td>6,763</td><td>1</td></tr>
+            <tr><td><span class="brand-name">cineasiaonline</span></td><td>Bluesky</td><td>1,124</td><td>1</td></tr>
+            <tr><td><span class="brand-name">laizakaya</span></td><td>Bluesky</td><td>50</td><td>1</td></tr>
+            <tr><td><span class="brand-name">@KALCALIVESINAF1</span></td><td>X</td><td>66</td><td>1</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="audience-bottom-grid">
+      <div class="insight audience-reading">
+        <strong>Lectura:</strong> México concentra la conversación (35%), seguido de República Dominicana y España. Foto y Link dominan como formato — la gente comparte posters, trailers y reseñas más que contenido original.
+      </div>
+      <div class="detractors-block">
+        <h3 style="font-size:20px;">Top Detractors</h3>
+        <p style="font-size:12px;color:var(--muted);margin-bottom:8px;">Solo 6 menciones negativas en el periodo. Ningún detractor con volumen significativo.</p>
+        <div class="m-card detractors-card" style="border-left:3px solid var(--green);padding:12px 16px;">
+          <div class="sub" style="font-size:13px;color:var(--text);">La conversación negativa es <strong>mínima y dispersa</strong> — no hay un detractor organizado ni un tema recurrente de queja.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="slide-brand"><img src="./assets/imgs/Logo_Mescalina_White.png" alt="mescalina"></div><div class="slide-number">09 / 12</div>
+</div>
+
+<!-- ========== SLIDE 10: VERBATIMS ========== -->
+<div class="slide">
+  <h3>Verbatims — Lo que dice la gente</h3>
+  <p class="subtitle">Menciones representativas agrupadas por sentimiento. Seleccionadas por relevancia y alcance.</p>
+  <div class="verb-grid" style="flex:1;">
+    <div class="verb-card pos">
+      <div class="clbl">Positivo — Valor artístico</div>
+      <p>"Kokuho es poesía visual. El teatro kabuki llevado al cine con un nivel de detalle en maquillaje y vestuario que justifica la nominación al Oscar."</p>
+      <div class="meta">X · @laestatuilla · 7.7K seguidores</div>
+    </div>
+    <div class="verb-card pos">
+      <div class="clbl">Positivo — Conexión emocional</div>
+      <p>"La historia de un hijo de yakuza que quiere convertirse en maestro del kabuki... son 3 horas que se pasan volando. Amistad, tradición, redención. No se la pierdan."</p>
+      <div class="meta">X · @GrungeHamster81 · 6.7K seguidores</div>
+    </div>
+    <div class="verb-card pos">
+      <div class="clbl">Positivo — Recomendación</div>
+      <p>"Si les gusta el cine japonés, Kokuho es imperdible. Ryo Yoshizawa está increíble y la forma en que retrata el arte del kabuki es hermosa."</p>
+      <div class="meta">Instagram · Cuenta de cinéfilo · República Dominicana</div>
+    </div>
+    <div class="verb-card pos">
+      <div class="clbl">Positivo — Anticipación</div>
+      <p>"¿En qué año podremos ver Kokuho acá? Ojalá llegue pronto a los cines de Latinoamérica, necesito vivir esa experiencia en pantalla grande."</p>
+      <div class="meta">Bluesky · cineasiaonline · 1.1K seguidores</div>
+    </div>
+    <div class="verb-card neg">
+      <div class="clbl">Negativo — Disponibilidad</div>
+      <p>"Me da rabia que Kokuho solo esté en cines de CDMX y Guadalajara. ¿Y los que vivimos en el norte qué? Ni actualizando la app de Cinépolis aparece."</p>
+      <div class="meta">X · Chihuahua, México</div>
+    </div>
+    <div class="verb-card neu">
+      <div class="clbl">Neutro — Informativo</div>
+      <p>"Kokuho, nominada al Oscar a Mejor Maquillaje y Peinado, llega a cartelera el jueves 2 de abril en Cinépolis +Que Cine."</p>
+      <div class="meta">News · prensa-latina.cu · Moz Rank 5.5</div>
+    </div>
+  </div>
+  <div class="slide-brand"><img src="./assets/imgs/Logo_Mescalina_White.png" alt="mescalina"></div><div class="slide-number">10 / 12</div>
+</div>
+
+<!-- ========== SLIDE 11: DIVIDER CONCLUSIONES ========== -->
+<div class="slide divider">
+  <div class="sec-num">04 — CONCLUSIONES</div>
+  <h2>¿Qué significa esto<br>para la <em>estrategia</em>?</h2>
+  <div class="slide-brand"><img src="./assets/imgs/Logo_Mescalina_White.png" alt="mescalina"></div><div class="slide-number">11 / 12</div>
+</div>
+
+<!-- ========== SLIDE 12: CONCLUSIONS ========== -->
+<div class="slide">
+  <h3>Hallazgos e implicaciones</h3>
+  <div class="conc-grid" style="margin-bottom:16px;">
+    <div class="conc-card"><p><span class="highlight">La conversación es culturalmente sofisticada.</span> Los términos dominantes son "arte", "tradición", "maestro", "poesía visual". No es una audiencia buscando entretenimiento casual — es un público cinéfilo y culturalmente curioso.</p></div>
+    <div class="conc-card"><p><span class="highlight">La nominación al Óscar es el gancho más efectivo.</span> Aparece en 13 menciones orgánicas y en el 85% de los clusters temáticos. Es el dato que convierte curiosidad en intención de compra.</p></div>
+    <div class="conc-card"><p><span class="highlight">Sentimiento abrumadoramente positivo (51.5%).</span> Solo 6 menciones negativas en 101 — y la queja principal es disponibilidad geográfica, no calidad. Esto es una señal de demanda insatisfecha, no de rechazo.</p></div>
+    <div class="conc-card"><p><span class="highlight">X domina la conversación (51.5%).</span> Es donde el público cinéfilo debate, recomienda y comparte. Instagram es segundo canal (33.7%) con contenido más visual (posters, stills). Bluesky emerge como canal nicho para comunidades de cine asiático.</p></div>
+  </div>
+  <div class="kcs-grid">
+    <div class="kcs-card keep">
+      <h4>Amplificar</h4>
+      <ul>
+        <li>La narrativa de "arte + tradición + redención" resuena. Usarla como eje de comunicación.</li>
+        <li>El dato "nominada al Óscar" es el closer. Incluirlo en TODA la comunicación.</li>
+        <li>La estética visual del kabuki es contenido que se comparte solo. Más stills, menos copy comercial.</li>
+      </ul>
+    </div>
+    <div class="kcs-card change">
+      <h4>Atender</h4>
+      <ul>
+        <li>La queja de disponibilidad geográfica es la única fricción real. Comunicar proactivamente dónde se proyecta.</li>
+        <li>Bluesky tiene tracción orgánica sin inversión — monitorear si crece como canal para cine asiático.</li>
+      </ul>
+    </div>
+    <div class="kcs-card start">
+      <h4>Explorar</h4>
+      <ul>
+        <li>El público de cine japonés y K-culture se superpone. ¿Hay oportunidad de cross-promoción con títulos de K-pop/anime?</li>
+        <li>Los advocates son cuentas de nicho con audiencias fieles. Una estrategia de seeding con preventas podría detonar conversación.</li>
+      </ul>
+    </div>
+  </div>
+  <div class="slide-brand"><img src="./assets/imgs/Logo_Mescalina_White.png" alt="mescalina"></div><div class="slide-number">12 / 12</div>
+</div>
+
+<!-- ========== CHARTS ========== -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script>
+const C = {
+  a:'#5fb8d9', w:'#f4a261', g:'#2ec4b6', r:'#e76f51',
+  p:'#a78bfa', pk:'#f78da7',
+  grid:'rgba(255,255,255,0.04)', muted:'#7a8da0'
+};
+Chart.defaults.color = C.muted;
+Chart.defaults.font.family = "'Poppins',sans-serif";
+Chart.defaults.font.size = 11;
+Chart.defaults.animation = false;
+Chart.defaults.responsive = true;
+Chart.defaults.maintainAspectRatio = false;
+Chart.defaults.plugins.legend.labels.boxWidth = 10;
+Chart.defaults.plugins.legend.labels.padding = 12;
+
+window.addEventListener('load', () => {
+
+// C1: Volume trend
+new Chart(document.getElementById('c1'), {
+  type: 'bar',
+  data: {
+    labels: ['Mar 26', 'Mar 27', 'Mar 28', 'Mar 29', 'Mar 30', 'Mar 31'],
+    datasets: [{
+      data: [12, 27, 16, 15, 15, 16],
+      backgroundColor: 'rgba(167,139,250,0.55)',
+      borderRadius: 4
+    }]
+  },
+  options: { scales: { y: { beginAtZero: true, grid: { color: C.grid } }, x: { grid: { display: false } } }, plugins: { legend: { display: false } } }
+});
+
+// C2: Channel distribution
+new Chart(document.getElementById('c2'), {
+  type: 'doughnut',
+  data: {
+    labels: ['X (52)', 'Instagram (34)', 'Bluesky (8)', 'News (4)', 'Otros (3)'],
+    datasets: [{ data: [52, 34, 8, 4, 3], backgroundColor: [C.a, C.pk, C.p, C.w, C.muted], borderWidth: 0 }]
+  },
+  options: { cutout: '55%', plugins: { legend: { position: 'bottom', labels: { font: { size: 10 } } } } }
+});
+
+// C3: Sentiment donut
+new Chart(document.getElementById('c3'), {
+  type: 'doughnut',
+  data: {
+    labels: ['Positivo', 'Neutro', 'Negativo'],
+    datasets: [{ data: [52, 43, 6], backgroundColor: [C.g, 'rgba(122,141,160,0.4)', C.r], borderWidth: 0 }]
+  },
+  options: { cutout: '60%', plugins: { legend: { position: 'bottom', labels: { font: { size: 10 } } } } }
+});
+
+// C4: Top terms
+new Chart(document.getElementById('c4'), {
+  type: 'bar',
+  data: {
+    labels: ['kabuki', 'kokuho', 'película', 'historia', 'teatro', 'alma', 'arte', 'japonés', 'cine', 'japón', 'maestro', 'yakuza'],
+    datasets: [{ data: [58, 58, 35, 34, 30, 28, 27, 26, 23, 17, 16, 15], backgroundColor: 'rgba(167,139,250,0.5)', borderRadius: 3 }]
+  },
+  options: { indexAxis: 'y', scales: { x: { grid: { color: C.grid } }, y: { grid: { display: false } } }, plugins: { legend: { display: false } } }
+});
+
+// C5: Hashtags
+new Chart(document.getElementById('c5'), {
+  type: 'bar',
+  data: {
+    labels: ['#kokuho', '#cinex', '#kabuki', '#películas', '#millenniumactress', '#bodasangrienta2', '#tevanamatar'],
+    datasets: [{ data: [46, 7, 4, 4, 4, 6, 6], backgroundColor: 'rgba(244,162,97,0.5)', borderRadius: 3 }]
+  },
+  options: { indexAxis: 'y', scales: { x: { grid: { color: C.grid } }, y: { grid: { display: false } } }, plugins: { legend: { display: false } } }
+});
+
+// C6: Geography
+new Chart(document.getElementById('c6'), {
+  type: 'bar',
+  data: {
+    labels: ['México', 'Rep. Dominicana', 'España', 'Venezuela', 'Otros'],
+    datasets: [{ data: [9, 5, 4, 2, 6], backgroundColor: [C.p, C.w, C.a, C.g, C.muted], borderRadius: 3 }]
+  },
+  options: { indexAxis: 'y', scales: { x: { grid: { color: C.grid } }, y: { grid: { display: false } } }, plugins: { legend: { display: false } } }
+});
+
+// C7: Content type
+new Chart(document.getElementById('c7'), {
+  type: 'doughnut',
+  data: {
+    labels: ['Foto (47)', 'Link (47)', 'Video (18)', 'Carousel (9)'],
+    datasets: [{ data: [47, 47, 18, 9], backgroundColor: [C.p, C.a, C.w, C.pk], borderWidth: 0 }]
+  },
+  options: { cutout: '50%', plugins: { legend: { position: 'bottom', labels: { font: { size: 10 } } } } }
+});
+
+});
+</script>
+</body>
+</html>
